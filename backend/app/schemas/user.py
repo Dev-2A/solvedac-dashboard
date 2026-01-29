@@ -16,3 +16,10 @@ class ProblemStat(BaseModel):
     level: int
     total: int
     solved: int
+
+
+class TagStat(BaseModel):
+    tag_key: str
+    tag_name: str
+    solved: int
+    rating: int

@@ -25,6 +25,16 @@ class SolvedacClient:
             )
             response.raise_for_status()
             return response.json()
+    
+    async def get_user_tag_stats(self, handle: str) -> list:
+        """사용자의 태그별 문제 풀이 통계"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/user/problem_tag_stats",
+                params={"handle": handle},
+            )
+            response.raise_for_status()
+            return response.json()
 
 
 solvedac_client = SolvedacClient()
