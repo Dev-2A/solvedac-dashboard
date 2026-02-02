@@ -34,3 +34,16 @@ class GrassData(BaseModel):
     grass: list[GrassDay]
     current_streak: int
     longest_streak: int
+
+
+class Problem(BaseModel):
+    problem_id: int
+    title: str
+    level: int
+    accepted_user_count: int
+    tags: list[str] = []
+
+
+class ProblemList(BaseModel):
+    count: int
+    items: list[Problem]

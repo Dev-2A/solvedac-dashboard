@@ -6,24 +6,72 @@ let tagChart = null;
 // 티어 색상 매핑
 const tierColors = [
   "#2d2d2d", // Unrated (0)
-  "#ad5600", "#ad5600", "#ad5600", "#ad5600", "#ad5600", // Bronze (1-5)
-  "#435f7a", "#435f7a", "#435f7a", "#435f7a", "#435f7a", // Silver (6-10)
-  "#ec9a00", "#ec9a00", "#ec9a00", "#ec9a00", "#ec9a00", // Gold (11-15)
-  "#27e2a4", "#27e2a4", "#27e2a4", "#27e2a4", "#27e2a4", // Platinum (16-20)
-  "#00b4fc", "#00b4fc", "#00b4fc", "#00b4fc", "#00b4fc", // Diamond (21-25)
-  "#ff0062", "#ff0062", "#ff0062", "#ff0062", "#ff0062", // Ruby (26-30)
+  "#ad5600",
+  "#ad5600",
+  "#ad5600",
+  "#ad5600",
+  "#ad5600", // Bronze (1-5)
+  "#435f7a",
+  "#435f7a",
+  "#435f7a",
+  "#435f7a",
+  "#435f7a", // Silver (6-10)
+  "#ec9a00",
+  "#ec9a00",
+  "#ec9a00",
+  "#ec9a00",
+  "#ec9a00", // Gold (11-15)
+  "#27e2a4",
+  "#27e2a4",
+  "#27e2a4",
+  "#27e2a4",
+  "#27e2a4", // Platinum (16-20)
+  "#00b4fc",
+  "#00b4fc",
+  "#00b4fc",
+  "#00b4fc",
+  "#00b4fc", // Diamond (21-25)
+  "#ff0062",
+  "#ff0062",
+  "#ff0062",
+  "#ff0062",
+  "#ff0062", // Ruby (26-30)
   "#b300e0", // Master (31)
 ];
 
 // 난이도 라벨
 const levelLabels = [
   "Unrated",
-  "B5", "B4", "B3", "B2", "B1",
-  "S5", "S4", "S3", "S2", "S1",
-  "G5", "G4", "G3", "G2", "G1",
-  "P5", "P4", "P3", "P2", "P1",
-  "D5", "D4", "D3", "D2", "D1",
-  "R5", "R4", "R3", "R2", "R1",
+  "B5",
+  "B4",
+  "B3",
+  "B2",
+  "B1",
+  "S5",
+  "S4",
+  "S3",
+  "S2",
+  "S1",
+  "G5",
+  "G4",
+  "G3",
+  "G2",
+  "G1",
+  "P5",
+  "P4",
+  "P3",
+  "P2",
+  "P1",
+  "D5",
+  "D4",
+  "D3",
+  "D2",
+  "D1",
+  "R5",
+  "R4",
+  "R3",
+  "R2",
+  "R1",
   "M",
 ];
 
@@ -38,14 +86,22 @@ async function loadUserData() {
   hideError();
 
   try {
-    const [profileRes, statsRes, tagsRes, grassRes] = await Promise.all([
-      fetch(`${API_BASE}/user/${handle}`),
-      fetch(`${API_BASE}/user/${handle}/stats`),
-      fetch(`${API_BASE}/user/${handle}/tags`),
-      fetch(`${API_BASE}/user/${handle}/grass`),
-    ]);
+    const [profileRes, statsRes, tagsRes, grassRes, problemsRes] =
+      await Promise.all([
+        fetch(`${API_BASE}/user/${handle}`),
+        fetch(`${API_BASE}/user/${handle}/stats`),
+        fetch(`${API_BASE}/user/${handle}/tags`),
+        fetch(`${API_BASE}/user/${handle}/grass`),
+        fetch(`${API_BASE}/user/${handle}/problems`),
+      ]);
 
-    if (!profileRes.ok || !statsRes.ok || !tagsRes.ok || !grassRes.ok) {
+    if (
+      !profileRes.ok ||
+      !statsRes.ok ||
+      !tagsRes.ok ||
+      !grassRes.ok ||
+      !problemsRes.ok
+    ) {
       throw new Error("API 요청 실패");
     }
 
@@ -53,16 +109,19 @@ async function loadUserData() {
     const stats = await statsRes.json();
     const tags = await tagsRes.json();
     const grass = await grassRes.json();
+    const problems = await problemsRes.json();
 
     console.log("profile:", profile);
     console.log("stats:", stats);
     console.log("tags:", tags);
     console.log("grass:", grass);
+    console.log("problems:", problems);
 
     displayProfile(profile);
     displayLevelChart(stats);
     displayTagChart(tags);
     displayGrass(grass);
+    displayProblems(problems);
 
     document.getElementById("chartsGrid").classList.add("show");
   } catch (error) {
@@ -94,7 +153,10 @@ function displayProfile(profile) {
   });
 
   if (card) card.classList.add("show");
-  if (image) image.src = profile.profile_image_url || "https://static.solved.ac/misc/default_profile.png";
+  if (image)
+    image.src =
+      profile.profile_image_url ||
+      "https://static.solved.ac/misc/default_profile.png";
   if (handle) handle.textContent = profile.handle;
   if (solved) solved.textContent = profile.solved_count.toLocaleString();
   if (rating) rating.textContent = profile.rating.toLocaleString();
@@ -153,7 +215,7 @@ function displayTagChart(tags) {
 
   // 기존 차트 파괴
   if (tagChart) {
-      tagChart.destroy();
+    tagChart.destroy();
   }
 
   // 상위 10개 태그만
@@ -243,16 +305,49 @@ function displayGrass(grassData) {
       dayEl.style.backgroundColor = "#00b4fc";
       dayEl.title = `${dateStr}: 프리즌`;
     } else if (value >= 10) {
-        dayEl.style.backgroundColor = "#39d353";
+      dayEl.style.backgroundColor = "#39d353";
     } else if (value >= 5) {
-        dayEl.style.backgroundColor = "#26a641";
+      dayEl.style.backgroundColor = "#26a641";
     } else if (value >= 3) {
-        dayEl.style.backgroundColor = "#006d32";
+      dayEl.style.backgroundColor = "#006d32";
     } else if (value >= 1) {
-        dayEl.style.backgroundColor = "#0e4429";
+      dayEl.style.backgroundColor = "#0e4429";
     }
 
     container.appendChild(dayEl);
+  });
+}
+
+function displayProblems(problemData) {
+  const section = document.getElementById("problemsSection");
+  const list = document.getElementById("problemList");
+
+  if (section) section.classList.add("show");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  problemData.items.forEach((problem) => {
+    const li = document.createElement("li");
+    li.className = "problem-item";
+
+    const tierColor = tierColors[problem.level] || "#333";
+    const tierName = levelLabels[problem.level] || "?";
+
+    li.innerHTML = `
+            <div class="problem-tier" style="background-color: ${tierColor};">${tierName}</div>
+            <div class="problem-info">
+                <a class="problem-title" href="https://www.acmicpc.net/problem/${problem.problem_id}" target="_blank">
+                    ${problem.title}
+                </a>
+                <div class="problem-tags">
+                    ${problem.tags.map((tag) => `<span class="problem-tag">${tag}</span>`).join("")}
+                </div>
+            </div>
+            <div class="problem-id">#${problem.problem_id}</div>
+        `;
+
+    list.appendChild(li);
   });
 }
 

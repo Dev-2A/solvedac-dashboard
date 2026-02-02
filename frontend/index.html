@@ -189,6 +189,76 @@
         height: 12px;
         border-radius: 2px;
       }
+
+      .problems-section {
+        margin-top: 24px;
+        display: none;
+      }
+
+      .problems-section.show {
+        display: block;
+      }
+
+      .problem-list {
+        list-style: none;
+      }
+
+      .problem-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-bottom: 1px solid #2a2a4e;
+      }
+
+      .problem-item:last-child {
+        border-bottom: none;
+      }
+
+      .problem-tier {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        color: #1a1a2e;
+      }
+
+      .problem-info {
+        flex: 1;
+      }
+
+      .problem-title {
+        color: #eee;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .problem-title:hover {
+        color: #17d4a5;
+      }
+
+      .problem-tags {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+      }
+
+      .problem-tag {
+        font-size: 11px;
+        background-color: #2a2a4e;
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: #aaa;
+      }
+
+      .problem-id {
+        color: #666;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
@@ -251,6 +321,13 @@
             ></div>
             <span>프리즌</span>
           </div>
+        </div>
+      </div>
+
+      <div class="problems-section" id="problemsSection">
+        <div class="chart-card">
+          <h3>🏆 푼 문제 중 최고 난이도 Top 10</h3>
+          <ul class="problem-list" id="problemList"></ul>
         </div>
       </div>
     </div>

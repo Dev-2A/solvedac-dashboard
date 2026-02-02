@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.services.solvedac_client import solvedac_client
-from app.schemas.user import UserProfile, ProblemStat, TagStat, GrassDay, GrassData
+from app.schemas.user import UserProfile, ProblemStat, TagStat, GrassDay, GrassData, Problem, ProblemList
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -86,4 +86,36 @@ async def get_user_grass(handle: str):
         )
     except Exception as e:
         print("Grass API 에러:", e)  # 디버깅용
+        raise HTTPException(status_code=404, detail=f"User not found: {handle}")
+
+
+@router.get("/{handle}/problems", response_model=ProblemList)
+async def get_user_top_problems(handle: str):
+    """사용자가 푼 문제 목록 (난이도 높은 순)"""
+    try:
+        data = await solvedac_client.get_user_top_problems(handle)
+        print("Problems API 응답:", data)  # 응답 확인
+        items = []
+        for item in data.get("items", [])[:10]:  # 상위 10개만
+            tags = []
+            for tag in item.get("tags", []):
+                display_names = tag.get("displayNames", [])
+                for name in display_names:
+                    if name.get("language") == "ko":
+                        tags.append(name.get("name", tag.get("key", "")))
+                        break
+            items.append(
+                Problem(
+                    problem_id=item.get("problemId", 0),
+                    title=item.get("titleKo", item.get("title", "")),
+                    level=item.get("level", 0),
+                    accepted_user_count=item.get("acceptedUserCount", 0),
+                    tags=tags[:3],
+                )
+            )
+        return ProblemList(count=data.get("count", 0), items=items)
+    except Exception as e:
+        import traceback
+        print("Problems API 에러:", e)
+        print("상세:", traceback.format_exc())  # 전체 스택 출력
         raise HTTPException(status_code=404, detail=f"User not found: {handle}")

@@ -45,6 +45,21 @@ class SolvedacClient:
             )
             response.raise_for_status()
             return response.json()
+    
+    async def get_user_top_problems(self, handle: str, page: int = 1) -> dict:
+        """사용자가 푼 문제 목록 (난이도순)"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/search/problem",
+                params={
+                    "query": f"solved_by:{handle}",
+                    "sort": "level",
+                    "direction": "desc",
+                    "page": page,
+                },
+            )
+            response.raise_for_status()
+            return response.json()
 
 
 solvedac_client = SolvedacClient()
