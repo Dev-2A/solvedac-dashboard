@@ -38,19 +38,36 @@ async function loadUserData() {
   hideError();
 
   try {
-    // 프로필, 난이도별 통계, 태그별 통계 동시 요청
-    const [profile, stats, tags] = await Promise.all([
-      fetch(`${API_BASE}/user/${handle}`).then((r) => r.json()),
-      fetch(`${API_BASE}/user/${handle}/stats`).then((r) => r.json()),
-      fetch(`${API_BASE}/user/${handle}/tags`).then((r) => r.json()),
+    const [profileRes, statsRes, tagsRes, grassRes] = await Promise.all([
+      fetch(`${API_BASE}/user/${handle}`),
+      fetch(`${API_BASE}/user/${handle}/stats`),
+      fetch(`${API_BASE}/user/${handle}/tags`),
+      fetch(`${API_BASE}/user/${handle}/grass`),
     ]);
+
+    if (!profileRes.ok || !statsRes.ok || !tagsRes.ok || !grassRes.ok) {
+      throw new Error("API 요청 실패");
+    }
+
+    const profile = await profileRes.json();
+    const stats = await statsRes.json();
+    const tags = await tagsRes.json();
+    const grass = await grassRes.json();
+
+    console.log("profile:", profile);
+    console.log("stats:", stats);
+    console.log("tags:", tags);
+    console.log("grass:", grass);
 
     displayProfile(profile);
     displayLevelChart(stats);
     displayTagChart(tags);
+    displayGrass(grass);
+
+    document.getElementById("chartsGrid").classList.add("show");
   } catch (error) {
     showError(`사용자를 찾을 수 없습니다: ${handle}`);
-    console.error(error);
+    console.error("에러 상세:", error);
   } finally {
     showLoading(false);
   }
@@ -173,6 +190,69 @@ function displayTagChart(tags) {
         },
       },
     },
+  });
+}
+
+function displayGrass(grassData) {
+  const section = document.getElementById("grassSection");
+  const container = document.getElementById("grassContainer");
+  const currentStreak = document.getElementById("currentStreak");
+  const longestStreak = document.getElementById("longestStreak");
+
+  if (section) section.classList.add("show");
+  if (currentStreak) currentStreak.textContent = grassData.current_streak;
+  if (longestStreak) longestStreak.textContent = grassData.longest_streak;
+
+  if (!container) return;
+
+  // 날짜별 value 맵 생성
+  const grassMap = {};
+  grassData.grass.forEach((item) => {
+    grassMap[item.date] = item.value;
+  });
+
+  // 최근 1년 날짜 생성 (일요일 시작)
+  const today = new Date();
+  const oneYearAgo = new Date(today);
+  oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+  // 시작일을 일요일로 맞춤
+  const startDate = new Date(oneYearAgo);
+  startDate.setDate(startDate.getDate() - startDate.getDay());
+
+  container.innerHTML = "";
+
+  // 53주 x 7일 그리드 생성
+  const days = [];
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= today) {
+    days.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  days.forEach((date) => {
+    const dateStr = date.toISOString().split("T")[0];
+    const value = grassMap[dateStr];
+
+    const dayEl = document.createElement("div");
+    dayEl.className = "grass-day";
+    dayEl.title = `${dateStr}: ${value || 0}문제`;
+
+    if (value === "frozen") {
+      dayEl.style.backgroundColor = "#00b4fc";
+      dayEl.title = `${dateStr}: 프리즌`;
+    } else if (value >= 10) {
+        dayEl.style.backgroundColor = "#39d353";
+    } else if (value >= 5) {
+        dayEl.style.backgroundColor = "#26a641";
+    } else if (value >= 3) {
+        dayEl.style.backgroundColor = "#006d32";
+    } else if (value >= 1) {
+        dayEl.style.backgroundColor = "#0e4429";
+    }
+
+    container.appendChild(dayEl);
   });
 }
 

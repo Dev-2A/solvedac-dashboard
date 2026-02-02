@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.services.solvedac_client import solvedac_client
-from app.schemas.user import UserProfile, ProblemStat, TagStat
+from app.schemas.user import UserProfile, ProblemStat, TagStat, GrassDay, GrassData
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -66,4 +66,24 @@ async def get_user_tag_stats(handle: str):
             )
         return result
     except Exception as e:
+        raise HTTPException(status_code=404, detail=f"User not found: {handle}")
+
+
+@router.get("/{handle}/grass", response_model=GrassData)
+async def get_user_grass(handle: str):
+    """사용자 잔디(스트릭) 정보"""
+    try:
+        data = await solvedac_client.get_user_grass(handle)
+        print("Grass API 응답:", data)  # 디버깅용
+        grass = [
+            GrassDay(date=item["date"], value=item["value"])
+            for item in data.get("grass", [])
+        ]
+        return GrassData(
+            grass=grass,
+            current_streak=data.get("currentStreak", 0),
+            longest_streak=data.get("longestStreak", 0),
+        )
+    except Exception as e:
+        print("Grass API 에러:", e)  # 디버깅용
         raise HTTPException(status_code=404, detail=f"User not found: {handle}")

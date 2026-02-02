@@ -35,6 +35,16 @@ class SolvedacClient:
             )
             response.raise_for_status()
             return response.json()
+    
+    async def get_user_grass(self, handle: str, topic: str = "default") -> dict:
+        """사용자의 잔디(스트릭) 정보"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/user/grass",
+                params={"handle": handle, "topic": topic},
+            )
+            response.raise_for_status()
+            return response.json()
 
 
 solvedac_client = SolvedacClient()

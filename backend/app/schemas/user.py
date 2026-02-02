@@ -23,3 +23,14 @@ class TagStat(BaseModel):
     tag_name: str
     solved: int
     rating: int
+
+
+class GrassDay(BaseModel):
+    date: str
+    value: int | str
+
+
+class GrassData(BaseModel):
+    grass: list[GrassDay]
+    current_streak: int
+    longest_streak: int
