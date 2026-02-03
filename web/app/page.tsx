@@ -4,11 +4,24 @@ import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import ProfileCard from "@/components/ProfileCard";
 import DifficultyChart from "@/components/DifficultyChart";
-import { UserProfile, ProblemStat, getUser, getUserStats } from "@/lib/api";
+import TagChart from "@/components/TagChart";
+import GrassCalendar from "@/components/GrassCalendar";
+import {
+  UserProfile,
+  ProblemStat,
+  TagStat,
+  GrassData,
+  getUser,
+  getUserStats,
+  getUserTagStats,
+  getUserGrass,
+} from "@/lib/api";
 
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<ProblemStat[] | null>(null);
+  const [tagStats, setTagStats] = useState<TagStat[] | null>(null);
+  const [grassData, setGrassData] = useState<GrassData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,14 +30,20 @@ export default function Home() {
     setError(null);
     setProfile(null);
     setStats(null);
+    setTagStats(null);
+    setGrassData(null);
 
     try {
-      const [profileData, statsData] = await Promise.all([
+      const [profileData, statsData, tagData, grass] = await Promise.all([
         getUser(handle),
         getUserStats(handle),
+        getUserTagStats(handle),
+        getUserGrass(handle),
       ]);
       setProfile(profileData);
       setStats(statsData);
+      setTagStats(tagData);
+      setGrassData(grass);
     } catch (err) {
       setError("사용자를 찾을 수 없습니다. 핸들을 확인해주세요.");
     } finally {
@@ -48,7 +67,13 @@ export default function Home() {
       {profile && (
         <div className="w-full flex flex-col gap-6">
           <ProfileCard profile={profile} />
-          {stats && <DifficultyChart stats={stats} />}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {stats && <DifficultyChart stats={stats} />}
+            {tagStats && <TagChart tagStats={tagStats} />}
+          </div>
+
+          {grassData && <GrassCalendar grassData={grassData} />}
         </div>
       )}
     </div>

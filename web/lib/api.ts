@@ -29,12 +29,10 @@ export interface ProblemStat {
 }
 
 export interface TagStat {
-  tag: {
-    key: string;
-    display_names: { language: string; name: string; short: string }[];
-  };
+  tag_key: string;
+  tag_name: string;
   solved: number;
-  tried: number;
+  rating: number;
 }
 
 export interface GrassDay {
@@ -44,9 +42,8 @@ export interface GrassDay {
 
 export interface GrassData {
   grass: GrassDay[];
-  theme: string;
-  currentStreak: number;
-  longestStreak: number;
+  current_streak: number;
+  longest_streak: number;
 }
 
 export interface TopProblem {
@@ -66,7 +63,7 @@ export async function getUserStats(handle: string): Promise<ProblemStat[]> {
 }
 
 export async function getUserTagStats(handle: string): Promise<TagStat[]> {
-  return fetchAPI(`/api/user/${handle}/tag-stats`);
+  return fetchAPI(`/api/user/${handle}/tags`);
 }
 
 export async function getUserGrass(handle: string): Promise<GrassData> {
@@ -74,5 +71,5 @@ export async function getUserGrass(handle: string): Promise<GrassData> {
 }
 
 export async function getUserTopProblems(handle: string): Promise<TopProblem[]> {
-  return fetchAPI(`/api/user/${handle}/top-problems`);
+  return fetchAPI(`/api/user/${handle}/problems`);
 }
