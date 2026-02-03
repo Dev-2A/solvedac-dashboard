@@ -298,6 +298,23 @@
         color: #1a1a2e;
         border-color: #17d4a5;
       }
+
+      .tier-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .tier-badge img {
+        vertical-align: middle;
+      }
+
+      .tier-badge span {
+        font-weight: bold;
+        color: #eee;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -325,6 +342,10 @@
         <img id="profileImage" src="" alt="프로필" />
         <div class="profile-info">
           <h2 id="profileHandle"></h2>
+          <div class="tier-badge">
+            <img id="tierBadge" src="" alt="티어" width="24" height="24" />
+            <span id="tierName"></span>
+          </div>
           <p>solved: <span class="stat" id="solvedCount"></span></p>
           <p>rating: <span class="stat" id="rating"></span></p>
           <p>ranking: <span class="stat" id="ranking"></span></p>

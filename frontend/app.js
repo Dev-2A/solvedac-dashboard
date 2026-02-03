@@ -75,8 +75,47 @@ const levelLabels = [
   "M",
 ];
 
+const tierNames = [
+  "Unrated",
+  "Bronze V",
+  "Bronze IV",
+  "Bronze III",
+  "Bronze II",
+  "Bronze I",
+  "Silver V",
+  "Silver IV",
+  "Silver III",
+  "Silver II",
+  "Silver I",
+  "Gold V",
+  "Gold IV",
+  "Gold III",
+  "Gold II",
+  "Gold I",
+  "Platinum V",
+  "Platinum IV",
+  "Platinum III",
+  "Platinum II",
+  "Platinum I",
+  "Diamond V",
+  "Diamond IV",
+  "Diamond III",
+  "Diamond II",
+  "Diamond I",
+  "Ruby V",
+  "Ruby IV",
+  "Ruby III",
+  "Ruby II",
+  "Ruby I",
+  "Master",
+];
+
 const RECENT_SEARCHES_KEY = "solvedac_recent_searches";
 const MAX_RECENT_SEARCHES = 5;
+
+function getTierBadgeUrl(tier) {
+  return `https://static.solved.ac/tier_small/${tier}.svg`;
+}
 
 function getRecentSearches() {
   const data = localStorage.getItem(RECENT_SEARCHES_KEY);
@@ -184,21 +223,12 @@ function displayProfile(profile) {
   const card = document.getElementById("profileCard");
   const image = document.getElementById("profileImage");
   const handle = document.getElementById("profileHandle");
+  const tierBadge = document.getElementById("tierBadge");
+  const tierNameEl = document.getElementById("tierName");
   const solved = document.getElementById("solvedCount");
   const rating = document.getElementById("rating");
   const ranking = document.getElementById("ranking");
   const streak = document.getElementById("maxStreak");
-
-  // 요소 존재 여부 디버깅
-  console.log("Elements found:", {
-    card: !!card,
-    image: !!image,
-    handle: !!handle,
-    solved: !!solved,
-    rating: !!rating,
-    ranking: !!ranking,
-    streak: !!streak,
-  });
 
   if (card) card.classList.add("show");
   if (image)
@@ -206,6 +236,8 @@ function displayProfile(profile) {
       profile.profile_image_url ||
       "https://static.solved.ac/misc/default_profile.png";
   if (handle) handle.textContent = profile.handle;
+  if (tierBadge) tierBadge.src = getTierBadgeUrl(profile.tier);
+  if (tierNameEl) tierNameEl.textContent = tierNames[profile.tier] || "Unrated";
   if (solved) solved.textContent = profile.solved_count.toLocaleString();
   if (rating) rating.textContent = profile.rating.toLocaleString();
   if (ranking) ranking.textContent = profile.ranking?.toLocaleString() || "-";
@@ -383,17 +415,17 @@ function displayProblems(problemData) {
     const tierName = levelLabels[problem.level] || "?";
 
     li.innerHTML = `
-            <div class="problem-tier" style="background-color: ${tierColor};">${tierName}</div>
+            <img src="${getTierBadgeUrl(problem.level)}" alt="${tierName}" width="20" height="20">
             <div class="problem-info">
                 <a class="problem-title" href="https://www.acmicpc.net/problem/${problem.problem_id}" target="_blank">
-                    ${problem.title}
+                  ${problem.title}
                 </a>
                 <div class="problem-tags">
-                    ${problem.tags.map((tag) => `<span class="problem-tag">${tag}</span>`).join("")}
+                  ${problem.tags.map((tag) => `<span class="problem-tag">${tag}</span>`).join("")}
                 </div>
             </div>
             <div class="problem-id">#${problem.problem_id}</div>
-        `;
+    `;
 
     list.appendChild(li);
   });
