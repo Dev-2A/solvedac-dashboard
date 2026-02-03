@@ -197,12 +197,6 @@ async function loadUserData() {
     const grass = await grassRes.json();
     const problems = await problemsRes.json();
 
-    console.log("profile:", profile);
-    console.log("stats:", stats);
-    console.log("tags:", tags);
-    console.log("grass:", grass);
-    console.log("problems:", problems);
-
     displayProfile(profile);
     displayLevelChart(stats);
     displayTagChart(tags);

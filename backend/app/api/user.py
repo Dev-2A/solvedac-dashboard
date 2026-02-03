@@ -74,7 +74,6 @@ async def get_user_grass(handle: str):
     """사용자 잔디(스트릭) 정보"""
     try:
         data = await solvedac_client.get_user_grass(handle)
-        print("Grass API 응답:", data)  # 디버깅용
         grass = [
             GrassDay(date=item["date"], value=item["value"])
             for item in data.get("grass", [])
@@ -85,7 +84,6 @@ async def get_user_grass(handle: str):
             longest_streak=data.get("longestStreak", 0),
         )
     except Exception as e:
-        print("Grass API 에러:", e)  # 디버깅용
         raise HTTPException(status_code=404, detail=f"User not found: {handle}")
 
 
@@ -94,7 +92,6 @@ async def get_user_top_problems(handle: str):
     """사용자가 푼 문제 목록 (난이도 높은 순)"""
     try:
         data = await solvedac_client.get_user_top_problems(handle)
-        print("Problems API 응답:", data)  # 응답 확인
         items = []
         for item in data.get("items", [])[:10]:  # 상위 10개만
             tags = []
@@ -115,7 +112,4 @@ async def get_user_top_problems(handle: str):
             )
         return ProblemList(count=data.get("count", 0), items=items)
     except Exception as e:
-        import traceback
-        print("Problems API 에러:", e)
-        print("상세:", traceback.format_exc())  # 전체 스택 출력
         raise HTTPException(status_code=404, detail=f"User not found: {handle}")
