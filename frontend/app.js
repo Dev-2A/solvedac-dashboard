@@ -75,6 +75,53 @@ const levelLabels = [
   "M",
 ];
 
+const RECENT_SEARCHES_KEY = "solvedac_recent_searches";
+const MAX_RECENT_SEARCHES = 5;
+
+function getRecentSearches() {
+  const data = localStorage.getItem(RECENT_SEARCHES_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function saveRecentSearch(handle) {
+  let searches = getRecentSearches();
+  // 중복 제거
+  searches = searches.filter((h) => h !== handle);
+  // 맨 앞에 추가
+  searches.unshift(handle);
+  // 최대 개수 유지
+  searches = searches.slice(0, MAX_RECENT_SEARCHES);
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+  displayRecentSearches();
+}
+
+function displayRecentSearches() {
+  const container = document.getElementById("recentSearches");
+  const list = document.getElementById("recentList");
+  const searches = getRecentSearches();
+
+  if (!container || !list) return;
+
+  if (searches.length === 0) {
+    container.classList.remove("show");
+    return;
+  }
+
+  container.classList.add("show");
+  list.innerHTML = "";
+
+  searches.forEach((handle) => {
+    const item = document.createElement("span");
+    item.className = "recent-item";
+    item.textContent = handle;
+    item.onclick = () => {
+      document.getElementById("handleInput").value = handle;
+      loadUserData();
+    };
+    list.appendChild(item);
+  });
+}
+
 async function loadUserData() {
   const handle = document.getElementById("handleInput").value.trim();
   if (!handle) {
@@ -122,6 +169,7 @@ async function loadUserData() {
     displayTagChart(tags);
     displayGrass(grass);
     displayProblems(problems);
+    saveRecentSearch(handle);
 
     document.getElementById("chartsGrid").classList.add("show");
   } catch (error) {
@@ -371,4 +419,9 @@ document.getElementById("handleInput").addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     loadUserData();
   }
+});
+
+// 페이지 로드 시 최근 검색 표시
+document.addEventListener("DOMContentLoaded", () => {
+  displayRecentSearches();
 });

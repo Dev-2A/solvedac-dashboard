@@ -259,6 +259,45 @@
         color: #666;
         font-size: 12px;
       }
+
+      .recent-searches {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+      }
+
+      .recent-searches.show {
+        display: flex;
+      }
+
+      .recent-label {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .recent-list {
+        display: flex;
+        gap: 8px;
+      }
+
+      .recent-item {
+        background-color: #16213e;
+        border: 1px solid #2a2a4e;
+        color: #aaa;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .recent-item:hover {
+        background-color: #17d4a5;
+        color: #1a1a2e;
+        border-color: #17d4a5;
+      }
     </style>
   </head>
   <body>
@@ -272,6 +311,11 @@
           placeholder="Solved.ac 아이디 입력"
         />
         <button onclick="loadUserData()">검색</button>
+      </div>
+
+      <div class="recent-searches" id="recentSearches">
+        <span class="recent-label">최근 검색:</span>
+        <div class="recent-list" id="recentList"></div>
       </div>
 
       <div class="loading" id="loading">데이터를 불러오는 중...</div>
