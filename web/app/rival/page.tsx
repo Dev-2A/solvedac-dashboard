@@ -3,27 +3,48 @@
 import { useState } from "react";
 import DualSearchBar from "@/components/DualSearchBar";
 import RivalProfileCard from "@/components/RivalProfileCard";
-import { UserProfile, getUser } from "@/lib/api";
+import RivalDifficultyChart from "@/components/RivalDifficultyChart";
+import RivalTagChart from "@/components/RivalTagChart";
+import {
+  UserProfile,
+  ProblemStat,
+  TagStat,
+  getUser,
+  getUserStats,
+  getUserTagStats,
+} from "@/lib/api";
+
+interface RivalData {
+  profile: UserProfile;
+  stats: ProblemStat[];
+  tagStats: TagStat[];
+}
 
 export default function RivalPage() {
-  const [profileA, setProfileA] = useState<UserProfile | null>(null);
-  const [profileB, setProfileB] = useState<UserProfile | null>(null);
+  const [dataA, setDataA] = useState<RivalData | null>(null);
+  const [dataB, setDataB] = useState<RivalData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (handleA: string, handleB: string) => {
     setIsLoading(true);
     setError(null);
-    setProfileA(null);
-    setProfileB(null);
+    setDataA(null);
+    setDataB(null);
 
     try {
-      const [dataA, dataB] = await Promise.all([
-        getUser(handleA),
-        getUser(handleB),
-      ]);
-      setProfileA(dataA);
-      setProfileB(dataB);
+      const [profileA, statsA, tagStatsA, profileB, statsB, tagStatsB] =
+        await Promise.all([
+          getUser(handleA),
+          getUserStats(handleA),
+          getUserTagStats(handleA),
+          getUser(handleB),
+          getUserStats(handleB),
+          getUserTagStats(handleB),
+        ]);
+
+      setDataA({ profile: profileA, stats: statsA, tagStats: tagStatsA });
+      setDataB({ profile: profileB, stats: statsB, tagStats: tagStatsB });
     } catch (err) {
       setError("사용자를 찾을 수 없습니다. 핸들을 확인해주세요.");
     } finally {
@@ -44,9 +65,24 @@ export default function RivalPage() {
 
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
-      {profileA && profileB && (
+      {dataA && dataB && (
         <div className="w-full flex flex-col gap-6">
-          <RivalProfileCard profileA={profileA} profileB={profileB} />
+          <RivalProfileCard profileA={dataA.profile} profileB={dataB.profile} />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RivalDifficultyChart
+              statsA={dataA.stats}
+              statsB={dataB.stats}
+              handleA={dataA.profile.handle}
+              handleB={dataB.profile.handle}
+            />
+            <RivalTagChart
+              tagStatsA={dataA.tagStats}
+              tagStatsB={dataB.tagStats}
+              handleA={dataA.profile.handle}
+              handleB={dataB.profile.handle}
+            />
+          </div>
         </div>
       )}
     </div>
