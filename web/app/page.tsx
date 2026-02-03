@@ -3,10 +3,12 @@
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import ProfileCard from "@/components/ProfileCard";
-import { UserProfile, getUser } from "@/lib/api";
+import DifficultyChart from "@/components/DifficultyChart";
+import { UserProfile, ProblemStat, getUser, getUserStats } from "@/lib/api";
 
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stats, setStats] = useState<ProblemStat[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,10 +16,15 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     setProfile(null);
+    setStats(null);
 
     try {
-      const data = await getUser(handle);
-      setProfile(data);
+      const [profileData, statsData] = await Promise.all([
+        getUser(handle),
+        getUserStats(handle),
+      ]);
+      setProfile(profileData);
+      setStats(statsData);
     } catch (err) {
       setError("사용자를 찾을 수 없습니다. 핸들을 확인해주세요.");
     } finally {
@@ -39,8 +46,9 @@ export default function Home() {
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
       {profile && (
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-6">
           <ProfileCard profile={profile} />
+          {stats && <DifficultyChart stats={stats} />}
         </div>
       )}
     </div>

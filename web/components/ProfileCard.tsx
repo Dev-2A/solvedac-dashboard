@@ -1,54 +1,5 @@
 import { UserProfile } from "@/lib/api";
-
-// 티어 번호 → 이름 변환
-function getTierName(tier: number): string {
-  const tiers = [
-    "Unrated",
-    "Bronze V",
-    "Bronze IV",
-    "Bronze III",
-    "Bronze II",
-    "Bronze I",
-    "Silver V",
-    "Silver IV",
-    "Silver III",
-    "Silver II",
-    "Silver I",
-    "Gold V",
-    "Gold IV",
-    "Gold III",
-    "Gold II",
-    "Gold I",
-    "Platinum V",
-    "Platinum IV",
-    "Platinum III",
-    "Platinum II",
-    "Platinum I",
-    "Diamond V",
-    "Diamond IV",
-    "Diamond III",
-    "Diamond II",
-    "Diamond I",
-    "Ruby V",
-    "Ruby IV",
-    "Ruby III",
-    "Ruby II",
-    "Ruby I",
-    "Master",
-  ];
-  return tiers[tier] || "Unknown";
-}
-
-function getTierColor(tier: number): string {
-  if (tier === 0) return "#666";
-  if (tier <= 5) return "#ad5600";
-  if (tier <= 10) return "#435f7a";
-  if (tier <= 15) return "#ec9a00";
-  if (tier <= 20) return "#27e2a4";
-  if (tier <= 25) return "#00b4fc";
-  if (tier <= 30) return "#ff0062";
-  return "#b300e0";
-}
+import { getTierName, getTierColor } from "@/lib/tier";
 
 interface ProfileCardProps {
   profile: UserProfile;
