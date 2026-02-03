@@ -5,6 +5,7 @@ import DualSearchBar from "@/components/DualSearchBar";
 import RivalProfileCard from "@/components/RivalProfileCard";
 import RivalDifficultyChart from "@/components/RivalDifficultyChart";
 import RivalTagChart from "@/components/RivalTagChart";
+import RivalSummary from "@/components/RivalSummary";
 import {
   UserProfile,
   ProblemStat,
@@ -68,6 +69,8 @@ export default function RivalPage() {
       {dataA && dataB && (
         <div className="w-full flex flex-col gap-6">
           <RivalProfileCard profileA={dataA.profile} profileB={dataB.profile} />
+
+          <RivalSummary profileA={dataA.profile} profileB={dataB.profile} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <RivalDifficultyChart
